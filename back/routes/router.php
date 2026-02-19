@@ -42,5 +42,20 @@ class Router{
             echo json_encode(["error" => "No autorizado"]);
             exit;
         }
+
+        $token = $_COOKIE["auth_token"];
+
+        $auth = new AuthModel();
+        $userId = $auth->validateToken($token);
+
+        if(!$userId){
+            setcookie("auth_token", "", time() - 3600, "/"); // Eliminar la cookie
+            http_response_code(401);
+            echo json_encode(["error" => "Token inválido o expirado"]);
+            exit;
+        }
+
+        //$_SESSION["user_id"] = $userId;
+        return true;
     }
 };

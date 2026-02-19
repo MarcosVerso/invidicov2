@@ -31,6 +31,16 @@ CREATE TABLE roles(
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
 );
 
+CREATE TABLE sesiones (
+    -- id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    token_hash VARCHAR(128) PRIMARY KEY, -- Guardamos el HASH del token, nunca el plano
+    ip_address VARCHAR(45) NULL,      -- Opcional: para auditoría de seguridad
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
 -- Insertar cargos:
 INSERT INTO cargos(nombre_cargo, descripcion, nivel_acceso) VALUES
 ('Administrador', 'para pruebas', 4),
@@ -80,3 +90,10 @@ INSERT INTO usuarios(nombre, apellido, email, password_hash) VALUES
 
 INSERT INTO roles(id_cargo, id_usuario)
 SELECT c.id, LAST_INSERT_ID() FROM cargos c WHERE c.nombre_cargo = "Administrador";
+
+
+SET GLOBAL event_scheduler = ON;
+CREATE EVENT limpiar_sesiones_expiradas
+ON SCHEDULE EVERY 10 SECONDS
+DO
+DELETE FROM sesiones WHERE expires_at < UTC_TIMESTAMP();

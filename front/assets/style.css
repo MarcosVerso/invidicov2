@@ -1,0 +1,230 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+main{
+    padding: 5% 5%;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+}
+
+header{
+    display: flex;
+    /*background: #1e293b;*/
+    background: linear-gradient(-45deg, #1e293b, #2a4063);
+    color: white;
+    padding: 10px 10%;
+    align-content: space-between;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header button{
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+input[type="text"], input[type="password"], input[type="email"], 
+input[type="number"], input[type="date"], select{
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    border: 1px solid #cbd5e1;
+    /*filter: drop-shadow(0 0px 1px rgb(202, 148, 31));*/
+    transition: 0.4s;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #3b82f6;
+    filter: drop-shadow(0 0px 2px rgb(59, 130, 246));
+}
+
+button, input[type="submit"], button[type="submit"] {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.app-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    min-height: calc(100vh - 60px);
+}
+
+.sidebar {
+    background: #1e293b;
+    color: white;
+    padding: 20px;
+    transition: 0.3s;
+}
+
+
+
+.sidebar ul { list-style: none; padding: 0; }
+.sidebar li {
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+
+.sidebar li:hover { background: #334155; }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    /*border-left: 5px solid #3b82f6;*/
+}
+
+.card.green { border-left-color: #10b981; }
+.card.purple { border-left-color: #8b5cf6; }
+
+.number {
+    font-size: 2rem;
+    font-weight: bold;
+    display: block;
+}
+
+.mt-20 { margin-top: 20px; }
+.hidden { display: none; }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.data-table th {
+    background: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pagination-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-page {
+    border: 1px solid #d1d5db;
+    background: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-page.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.btn-nav:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Contenedor de la barra */
+.progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 200px;
+}
+
+.progress-bg {
+    flex-grow: 1;
+    height: 8px;
+    background-color: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 35px;
+}
+
+.progress-sub {
+    display: block;
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* Badges y botones */
+.badge-cliente {
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #475569;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.mt-10 { margin-top: 10px; }
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.btn-icon:hover { transform: scale(1.2); }
