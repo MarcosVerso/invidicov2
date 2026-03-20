@@ -11,7 +11,12 @@ export class BaseComponent extends HTMLElement {
 
     render() {
         const template = document.createElement("template");
-        const htmlContent = this.html();
+        template.innerHTML = `
+            <style>${this.style()}</style>
+            ${this.html()}
+        `;
+        this.shadowRoot.innerHTML = '';
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
     style() { return ''; }
