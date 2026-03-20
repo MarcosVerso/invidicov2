@@ -1,12 +1,13 @@
 import { CargarUI } from "./app.js";
 import { Auth } from "./auth.js";
+import { AppComponent } from "./components/AppComponent.js";
 import { Router } from "./router.js";
 import * as Views from "./views/index.js";
 
 
 
 //document.addEventListener("DOMContentLoaded", async ()=>{
-CargarUI();
+/*CargarUI();
 const router = new Router();
 window.router = router;
 router.addRoute("/dashboard", Views.DashboardComponent, 1,2,3,4);
@@ -16,6 +17,7 @@ router.addRoute("/proyectos", Views.ProyectosComponent, 1,2,3,4);
 
 
 router.handleRouting();
+*/
 /*router.addRoute("/dashboard", (container, user)=>{
     alert("asd");
     Auth.isValid();

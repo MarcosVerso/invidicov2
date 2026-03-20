@@ -3,7 +3,9 @@ import { BaseComponent } from "./BaseComponent.js";
 export class AppComponent extends BaseComponent{
     html(){
         return `
-            <div id="app"></div>
+            <div id="app">
+                <app-header></app-header>
+            </div>
         `;
     }
 
@@ -17,3 +19,5 @@ export class AppComponent extends BaseComponent{
         `;
     }
 }
+
+customElements.define("app-root", AppComponent);

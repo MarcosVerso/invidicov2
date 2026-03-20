@@ -1,3 +1,4 @@
+import { Auth } from "../auth.js";
 import { BaseComponent } from "./BaseComponent.js";
 
 export class HeaderComponent extends BaseComponent{
@@ -43,5 +44,31 @@ export class HeaderComponent extends BaseComponent{
         `;
     }
 
-    
+    afterRender(){
+        this.updateUI();
+        window.addEventListener("authStateChanged", ()=>this.updateUI());
+    }
+
+    async updateUI(){
+        const authStatus = await Auth.isValid();
+        const authZone = header.querySelector("#auth-zone");
+        //alert(authStatus.valid);
+        if(authStatus.valid){
+            authZone.innerHTML = `
+                <div class="user-info">
+                    <span>Hola, <strong>${authStatus.user.nombre}</strong></span>
+                    <button id="logout">Cerrar Sesión</button>
+                </div>
+            `;
+            document.getElementById("logout").addEventListener("click", ()=>{
+                Auth.logout();
+            }  );
+        }else{
+            authZone.innerHTML = `
+            <button onclick="window.router.navigate('/login')">Iniciar sesión</button>
+            `;
+        }
+    }
 }
+
+customElements.define("app-header", HeaderComponent);
