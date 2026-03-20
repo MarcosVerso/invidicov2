@@ -1,3 +1,4 @@
+import { Modal } from "../components/modal/modal.js";
 import { Pagination } from "../components/pagination.js";
 
 let paginaActual = 1;
@@ -38,6 +39,7 @@ export function ProyectosComponent(container, user) {
                         <tr>
                             <th>Proyecto</th>
                             <th>Cliente</th>
+                            ${maximoNivel >= 3 ? '<th>Miembros</th>' : ''}
                             <th>Progreso Total</th>
                             <th>Entrega</th>
                             ${maximoNivel >= 3 ? '<th>Acciones</th>' : ''}
@@ -130,6 +132,7 @@ async function renderProyectos(user) {
         tr.innerHTML = `
             <td><strong>${p.nombre_proyecto}</strong></td>
             <td><span class="badge-cliente">${p.nombre}</span></td>
+            <td><span class="badge-miembros">${p.miembros || "Ninguno"}</span></td>
             <td>
                 <div class="progress-wrapper">
                     <div class="progress-bg">
@@ -162,22 +165,57 @@ async function renderProyectos(user) {
             tr.querySelector('.btn-edit').onclick = async () => {
                 // Aquí podrías implementar la lógica para editar el proyecto
                 //alert('Funcionalidad de edición no implementada aún.');
-                const response = await fetch('/api/actualizarProyecto', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: p.id,
-                        nombre_proyecto: prompt('Nuevo nombre del proyecto:', p.nombre_proyecto) || p.nombre_proyecto,
-                        // Aquí podrías agregar más campos para editar
-                    })
-                });
+                Modal(`Proyecto ${p.nombre_proyecto}`, 
+                    await obtenerContenidoGestionEquipo(p));
+                
+                const inputBusqueda = document.getElementById('busquedaUsuario');
+                const resultados = document.getElementById('resultadosBusqueda');
+                const listaMiembros = document.getElementById('listaMiembros');
 
-                const data = response.json();
-                if (!data.error) {
-                    renderProyectos(user);
-                } else {
-                    alert("Error: " + data.error);
-                }
+                const renderMiembros = (miembros) => {
+                    listaMiembros.innerHTML = miembros.map(m => `
+                        <div class="pill">
+                            ${m.nombre} <small>(${m.rol})</small>
+                            <button onclick="eliminarMiembro(${m.id})">&times;</button>
+                        </div>
+                    `).join('');
+                };
+
+                inputBusqueda.oninput = async (e) => {
+                    const query = e.target.value;
+                    if (query.length < 2) { resultados.innerHTML = ''; return; }
+            
+                    // Fetch a tu API de usuarios
+                    const resp = await fetch('/api/buscarUsuarios', {
+                        method: 'POST',
+                        body: JSON.stringify({ busqueda: query })
+                    });
+                    const users = await resp.json();
+            
+                    resultados.innerHTML = users.map(u => `
+                        <div class="search-item" data-id="${u.id}" data-nombre="${u.nombre}">
+                            ${u.nombre} - <span class="text-muted">${u.rol}</span>
+                        </div>
+                    `).join('');
+                };
+            
+                // Evento al elegir un usuario de la búsqueda
+                resultados.onclick = async (e) => {
+                    const item = e.target.closest('.search-item');
+                    if (item) {
+                        const idUsuario = item.dataset.id;
+                        // Llamada a tu API para asignar
+                        await fetch('/api/asignarProyecto', {
+                            method: 'POST',
+                            body: JSON.stringify({ id_proyecto: p.id, id_usuario: idUsuario })
+                        });
+                        
+                        alert('Usuario asignado');
+                        inputBusqueda.value = '';
+                        resultados.innerHTML = '';
+                        // Aquí deberías refrescar la lista de miembros
+                    }
+                };
             };
         }
     });
@@ -189,4 +227,50 @@ async function renderProyectos(user) {
             renderProyectos(user);
         }));
     }
+}
+
+// Función auxiliar para generar el contenido del equipo
+async function obtenerContenidoGestionEquipo(proyecto) {
+    const response = await fetch('/api/obtenerMiembrosProyecto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_proyecto: proyecto.id })
+    });
+    
+    // Asumimos que la API devuelve un array de miembros
+    const data = await response.json();
+    let miembros = [];
+    if(data.success)
+        miembros = data.miembros;
+
+    // Creamos las "pills" antes de retornar el HTML
+    const pillsHTML = miembros.length > 0 
+        ? miembros.map(m => `
+            <div class="pill" data-id="${m.id_usuario}">
+                <span>${m.nombre} <small>(${m.rol || 'Miembro'})</small></span>
+                <button class="btn-remove-member" data-id="${m.id_usuario}">&times;</button>
+            </div>`).join('')
+        : '<span class="text-muted">Sin miembros asignados</span>';
+
+    return `
+        <div class="gestion-equipo">
+            <p>Gestionar personal para: <strong>${proyecto.nombre_proyecto}</strong></p>
+            
+            <div class="search-box">
+                <input type="search" id="busquedaUsuario" placeholder="Buscar usuario para añadir..." class="form-control" autocomplete="off">
+                <div id="resultadosBusqueda" class="resultados-busqueda"></div>
+            </div>
+
+            <div class="equipo-actual mt-20">
+                <label>Miembros asignados:</label>
+                <div id="listaMiembros" class="pills-container">
+                    ${pillsHTML}
+                </div>
+            </div>
+
+            <div class="form-actions mt-20">
+                <button id="btnFinalizarEquipo" class="btn-save" onclick="this.closest('.modal-overlay').remove()">Finalizar</button>
+            </div>
+        </div>
+    `;
 }

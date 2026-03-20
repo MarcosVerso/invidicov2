@@ -71,3 +71,15 @@ function getEstadisticas() {
         "disenos" => $data['d_pendientes'] ?? 0
     ]);
 }
+
+function getMiembrosProyecto() {
+    $proyectoModel = new ProyectoModel();
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (isset($data['id_proyecto'])) {
+        $id_proyecto = $data['id_proyecto'];
+        $miembros = $proyectoModel->getMiembros($id_proyecto);
+        echo json_encode(['success' => true, 'miembros' => $miembros]);
+    } else {
+        echo json_encode(['error' => 'Falta el ID del proyecto']);
+    }
+}

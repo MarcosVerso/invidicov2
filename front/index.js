@@ -14,6 +14,7 @@ router.addRoute("/login", Views.login, 0);
 router.addRoute("/clientes", Views.ClientesComponent, 1,2,3,4);
 router.addRoute("/proyectos", Views.ProyectosComponent, 1,2,3,4);
 
+
 router.handleRouting();
 /*router.addRoute("/dashboard", (container, user)=>{
     alert("asd");

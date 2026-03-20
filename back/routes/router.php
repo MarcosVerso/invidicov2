@@ -34,7 +34,7 @@ class Router{
     }
 
     public function checkAccess($level){
-        if($level==="public")
+        if($level===0)
             return true;
 
         if(!isset($_COOKIE["auth_token"])){
@@ -54,6 +54,21 @@ class Router{
             echo json_encode(["error" => "Token inválido o expirado"]);
             exit;
         }
+
+        //aqui chequear todos los roles del usuario
+         $userModel = new UserModel();
+         $roles = $userModel->getFullUserDataById($userId);
+         $nivelUsuario = 0;
+         foreach($roles as $rol){
+             if($rol["nivel_acceso"] > $nivelUsuario)
+                $nivelUsuario = $rol["nivel_acceso"];
+         }
+
+         if($nivelUsuario < $level){
+            http_response_code(403);
+            echo json_encode(["error" => "Acceso denegado"]);
+            exit;
+         }
 
         //$_SESSION["user_id"] = $userId;
         return true;

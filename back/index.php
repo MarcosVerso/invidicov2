@@ -6,18 +6,19 @@ include_once './routes/proyecto.php';
 
 $router = new Router();
 
-$router->addRoute("/validarToken", "POST", "public", "validateToken");
-$router->addRoute("/login", "POST", "public", "login");
-$router->addRoute("/logout", "POST", "public", "logout");
-$router->addRoute("/obtenerClientes", "POST", "public", "getAllClientes");
-$router->addRoute("/insertarCliente", "POST", "public", "insertCliente");
-$router->addRoute("/actualizarCliente", "POST", "public", "updateCliente");
-$router->addRoute("/eliminarCliente", "POST", "public", "deleteCliente");
-$router->addRoute("/actualizarCliente", "POST", "public", "updateCliente");
-$router->addRoute("/obtenerProyectos", "POST", "public", "getAllProyectos");
-$router->addRoute("/insertarProyecto", "POST", "public", "insertProyecto");
-$router->addRoute("/actualizarProyecto", "POST", "public", "updateProyecto");
-$router->addRoute("/eliminarProyecto", "POST", "public", "deleteProyecto");
-$router->addRoute("/obtenerEstadisticas", "POST", "public", "getEstadisticas");
+$router->addRoute("/validarToken", "POST", 0, "validateToken");
+$router->addRoute("/login", "POST", 0, "login");
+$router->addRoute("/logout", "POST", 0, "logout");
+$router->addRoute("/obtenerClientes", "POST", 0, "getAllClientes");
+$router->addRoute("/insertarCliente", "POST", 0, "insertCliente");
+$router->addRoute("/actualizarCliente", "POST", 0, "updateCliente");
+$router->addRoute("/eliminarCliente", "POST", 0, "deleteCliente");
+$router->addRoute("/actualizarCliente", "POST", 0, "updateCliente");
+$router->addRoute("/obtenerProyectos", "POST", 0, "getAllProyectos");
+$router->addRoute("/insertarProyecto", "POST", 0, "insertProyecto");
+$router->addRoute("/actualizarProyecto", "POST",0, "updateProyecto");
+$router->addRoute("/eliminarProyecto", "POST", 0, "deleteProyecto");
+$router->addRoute("/obtenerEstadisticas", "POST",0, "getEstadisticas");
+$router->addRoute("/obtenerMiembrosProyecto", "POST", 0, "getMiembrosProyecto");
 
 $router->run();

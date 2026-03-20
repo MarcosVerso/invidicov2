@@ -15,9 +15,12 @@ class ProyectoModel{
      }
 
      public function getAllProyectos($porPagina = 0, $offset = 0) {
-        $consulta = "SELECT p.*, c.nombre 
+        $consulta = "SELECT p.*, c.nombre, GROUP_CONCAT(u.nombre SEPARATOR ', ') AS miembros
         FROM proyectos p
         LEFT JOIN clientes c ON p.id_cliente = c.id
+        LEFT JOIN integrantes i ON p.id = i.id_proyecto 
+        LEFT JOIN usuarios u ON i.id_usuario = u.id
+        GROUP BY p.id
         LIMIT $porPagina OFFSET $offset";
         if($porPagina<=0)
             $consulta = "SELECT * FROM proyectos";
@@ -71,5 +74,16 @@ class ProyectoModel{
         $data = $res->fetch_assoc();
 
         return $data;
+    }
+
+    public function getMiembros($id_proyecto){
+        $consulta = "SELECT u.nombre FROM usuarios u
+        JOIN integrantes i ON u.id = i.id_usuario
+        WHERE i.id_proyecto = ?";
+        $resultado = $this->bdd->consultaParametrizada($consulta, [$id_proyecto]);
+        if ($resultado->num_rows > 0) {
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        }
+        return null;
     }
 }
