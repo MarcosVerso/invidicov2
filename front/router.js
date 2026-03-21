@@ -5,8 +5,9 @@ import { Sidebar } from "./components/sidebar.js";
 export class Router {
     constructor() {
         this.routes = {};
-        this.mainContainer = document.getElementById("main");
-
+        this.mainContainer = document.querySelector("app-root").shadowRoot.querySelector("#main");
+        if(this.mainContainer)
+        console.log(this.mainContainer.innerHTML);
         //const user = Auth.isValid();
         //console.log(user);
         //document.querySelector("header").innerHTML = Header(user.user).innerHTML;
@@ -63,8 +64,13 @@ export class Router {
             }
         }
 
-        //this.mainContainer.innerHTML = '';
-        route.component(this.mainContainer, userData);
+        this.mainContainer.innerHTML = '';
+        if(userData && typeof route.component.setUser === "function"){
+            route.component.setUser(userData);
+        }
+
+        this.mainContainer.appendChild(route.component);
+        //route.component(this.mainContainer, userData);
     }
 }
 

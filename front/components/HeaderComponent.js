@@ -51,7 +51,7 @@ export class HeaderComponent extends BaseComponent{
 
     async updateUI(){
         const authStatus = await Auth.isValid();
-        const authZone = header.querySelector("#auth-zone");
+        const authZone = this.shadowRoot.querySelector("#auth-zone");//header.querySelector("#auth-zone");
         //alert(authStatus.valid);
         if(authStatus.valid){
             authZone.innerHTML = `
@@ -60,7 +60,7 @@ export class HeaderComponent extends BaseComponent{
                     <button id="logout">Cerrar Sesión</button>
                 </div>
             `;
-            document.getElementById("logout").addEventListener("click", ()=>{
+            this.shadowRoot.getElementById("logout").addEventListener("click", ()=>{
                 Auth.logout();
             }  );
         }else{

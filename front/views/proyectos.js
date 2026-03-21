@@ -1,4 +1,215 @@
-import { Modal } from "../components/modal/modal.js";
+import { BaseViewComponent } from "./BaseViewComponent.js";
+
+export class ProyectosComponent extends BaseViewComponent{
+    constructor(){
+        super();
+        this.paginaActual = 1;
+    }
+
+    get maximoNivel() {
+        return this.userLevel;
+    }
+
+    style(){
+        return `
+        :host { display: block; padding: 20px; }
+            .content-wrapper { width: 100%; }
+            .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+            .hidden { display: none; }
+            .badge-cliente { background-color: #3b82f6; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; }
+            .badge-miembros { background-color: #6b7280; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; }
+            .progress-wrapper { position: relative; height: 20px; background-color: #e5e7eb; border-radius: 10px; overflow: hidden; }
+            .progress-fill { height: 100%; transition: width 0.5s ease; }
+            .progress-text { position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-size: 0.8rem; color: #333; }
+            .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
+            .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .badge-cliente {
+            background-color: #3b82f6;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        .badge-miembros {
+            background-color: #6b7280;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        .progress-wrapper {
+            position: relative;
+            height: 20px;
+            background-color: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bg {
+            width: 100%;
+            height: 100%;
+        }
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        .progress-text {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #333;
+        }
+        .progress-sub {
+            font-size: 0.7rem;
+            color: #555;
+        }
+        .search-box {
+            position: relative;
+        }
+        .resultados-busqueda {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+        .search-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .search-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        `;
+    }
+
+    html(){
+        return `
+        <div class="content-wrapper">
+            <div class="section-header">
+                <h2>Gestión de Proyectos</h2>
+                ${this.maximoNivel >= 3 ? `<button id="btnNuevoProyecto" class="btn-primary">+ Nuevo Proyecto</button>` : ''}
+            </div>
+
+            <div id="form-container" class="hidden">
+                <form id="proyectoForm" class="card">
+                    <div class="form-grid">
+                        <input type="text" id="nombreProyecto" placeholder="Nombre del Proyecto" required>
+                        <select id="selectCliente" required>
+                            <option value="">Seleccione un Cliente...</option>
+                        </select>
+                        <input type="date" id="fechaEntrega" required>
+                    </div>
+                    <div class="form-actions mt-10">
+                        <button type="submit" class="btn-save">Guardar Proyecto</button>
+                        <button type="button" class="btn-cancel" id="btnCancelar">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card mt-20">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Proyecto</th>
+                            <th>Cliente</th>
+                            ${this.maximoNivel >= 3 ? '<th>Miembros</th>' : ''}
+                            <th>Progreso Total</th>
+                            <th>Entrega</th>
+                            ${this.maximoNivel >= 3 ? '<th>Acciones</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody id="lista-proyectos">
+                        <tr><td colspan="6">Cargando proyectos...</td></tr>
+                    </tbody>
+                </table>
+                <div id="paginacion-proyectos"></div>
+            </div>
+        </div>
+        `;
+    }
+
+    async cargarClientesSelect() {
+        const select = this.shadowRoot.querySelector("#selectCliente");
+        // Usamos tu API de clientes pero con porPagina 0 para traer todos
+        const response = await fetch('/api/obtenerClientes', {
+            method: 'POST',
+            body: JSON.stringify({})
+        });
+        const data = await response.json();
+        
+        select.innerHTML = '<option value="">Seleccione un Cliente...</option>' + 
+            data.clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+    }
+    
+    async renderProyectos() {
+        const tbody = this.shadowRoot.querySelector("#lista-proyectos");
+        if (!tbody) return;
+
+        try {
+            const response = await fetch('/api/obtenerProyectos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pagina: this.paginaActual, porPagina: 5 })
+            });
+
+            const { proyectos, totalPaginas } = await response.json();
+            tbody.innerHTML = '';
+
+            proyectos.forEach(p => {
+                const asignados = (parseInt(p.disenos_asignados) || 0) + (parseInt(p.videos_asignados) || 0);
+                const listos = (parseInt(p.disenos_listos) || 0) + (parseInt(p.videos_listos) || 0);
+                const porcentaje = asignados > 0 ? Math.round((listos / asignados) * 100) : 0;
+                const colorBarra = porcentaje === 100 ? '#10b981' : (porcentaje > 50 ? '#3b82f6' : '#f59e0b');
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${p.nombre_proyecto}</strong></td>
+                    <td><span class="badge-cliente">${p.nombre}</span></td>
+                    ${this.maximoNivel >= 3 ? `<td><span class="badge-miembros">${p.miembros || "Ninguno"}</span></td>` : ''}
+                    <td>
+                        <div class="progress-wrapper">
+                            <div class="progress-fill" style="width: ${porcentaje}%; background-color: ${colorBarra}"></div>
+                            <span class="progress-text">${porcentaje}%</span>
+                        </div>
+                    </td>
+                    <td>${p.fecha_destino}</td>
+                    ${this.maximoNivel >= 3 ? `
+                    <td>
+                        <button class="btn-icon btn-edit" data-id="${p.id}">✏️</button>
+                        <button class="btn-icon btn-delete" data-id="${p.id}">🗑️</button>
+                    </td>` : ''}
+                `;
+                
+                // Eventos de botones
+                if (this.maximoNivel >= 3) {
+                    tr.querySelector('.btn-delete').onclick = () => this.eliminarProyecto(p.id);
+                    tr.querySelector('.btn-edit').onclick = () => this.abrirGestionEquipo(p);
+                }
+
+                tbody.appendChild(tr);
+            });
+
+            this.renderPagination(totalPaginas);
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="6">Error al cargar proyectos ${e}</td></tr>`;
+        }
+    }
+    
+    afterRender(){
+        this.renderProyectos();
+    }
+};
+
+customElements.define("proyectos-view", ProyectosComponent);
+
+/*import { Modal } from "../components/modal/modal.js";
 import { Pagination } from "../components/pagination.js";
 
 let paginaActual = 1;
@@ -273,4 +484,4 @@ async function obtenerContenidoGestionEquipo(proyecto) {
             </div>
         </div>
     `;
-}
+}*/
