@@ -196,7 +196,7 @@ export class ProyectosComponent extends BaseViewComponent{
                 tbody.appendChild(tr);
             });
 
-            this.renderPagination(totalPaginas);
+            //this.renderPagination(totalPaginas);
         } catch (e) {
             tbody.innerHTML = `<tr><td colspan="6">Error al cargar proyectos ${e}</td></tr>`;
         }
