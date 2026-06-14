@@ -204,6 +204,16 @@ export class ProyectosComponent extends BaseViewComponent{
     
     afterRender(){
         this.renderProyectos();
+        const pepe = this.shadowRoot.getElementById("btnNuevoProyecto");
+        const a = this.shadowRoot.getElementById("form-container");
+        pepe.addEventListener("click", ()=>{
+            //alert("pepe");
+            a.classList.remove("hidden");
+        });
+
+        this.shadowRoot.getElementById("btnCancelar").addEventListener("click", ()=>{
+            a.classList.add("hidden");
+        });
     }
 };
 
