@@ -240,11 +240,12 @@ async function obtenerContenidoGestionEquipo(proyecto) {
     // Asumimos que la API devuelve un array de miembros
     const data = await response.json();
     let miembros = [];
-    if(data.success)
-        miembros = data.miembros;
+    //if(data.success)
+    miembros = data.miembros;
+    //console.log(miembros);
 
     // Creamos las "pills" antes de retornar el HTML
-    const pillsHTML = miembros.length > 0 
+    const pillsHTML = miembros.length > 0
         ? miembros.map(m => `
             <div class="pill" data-id="${m.id_usuario}">
                 <span>${m.nombre} <small>(${m.rol || 'Miembro'})</small></span>
